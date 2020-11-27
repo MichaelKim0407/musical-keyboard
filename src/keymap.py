@@ -1,5 +1,8 @@
-import pygame
 import typing
+
+import pygame
+
+from midi import MidiOutput
 
 
 class KeyMap:
@@ -72,3 +75,32 @@ class KeyMap:
         if seq_note is None:
             return None
         return seq_note + (abs_pos // 7) * 12
+
+
+class KeyboardPlayer:
+    def __init__(
+            self,
+            midi_output: MidiOutput,
+            keymap: KeyMap,
+    ):
+        self.midi_output = midi_output
+        self.keymap = keymap
+
+    def _handle_keydown(self, event):
+        note = self.keymap.get_note(event.key)
+        if note is None:
+            return
+        self.midi_output.note_on(note)
+
+    def _handle_keyup(self, event):
+        note = self.keymap.get_note(event.key)
+        if note is None:
+            return
+        self.midi_output.note_off(note)
+
+    def __call__(self, event) -> None:
+        if event.type == pygame.KEYDOWN:
+            self._handle_keydown(event)
+
+        if event.type == pygame.KEYUP:
+            self._handle_keyup(event)

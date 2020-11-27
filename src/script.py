@@ -2,32 +2,24 @@ import typing
 from dataclasses import dataclass
 from functools import cached_property
 
-import pygame.midi
 from returns import returns
 
-from midi import MidiConfig
+from midi import MidiOutput
 
 
 @dataclass(frozen=True)
 class MidiEvent:
-    NOTE_ON = 'note_on'
-    NOTE_OFF = 'note_off'
-
     _NAME_SORT = (
-        NOTE_OFF,
-        NOTE_ON,
+        MidiOutput.NOTE_OFF,
+        MidiOutput.NOTE_ON,
     )
 
     time: float
     name: str
     note: int
 
-    def __call__(
-            self,
-            midi_out: pygame.midi.Output,
-            midi_config: MidiConfig,
-    ):
-        getattr(midi_out, self.name)(self.note, midi_config.velocity)
+    def __call__(self, midi_output: MidiOutput):
+        midi_output(self.name, self.note)
 
     @cached_property
     def _sort(self):
@@ -78,12 +70,12 @@ class Script:
         for note, start, duration in self.notes:
             yield MidiEvent(
                 start,
-                MidiEvent.NOTE_ON,
+                MidiOutput.NOTE_ON,
                 note,
             )
             yield MidiEvent(
                 start + duration,
-                MidiEvent.NOTE_OFF,
+                MidiOutput.NOTE_OFF,
                 note,
             )
 
@@ -91,14 +83,12 @@ class Script:
 class ScriptPlayer:
     def __init__(
             self,
-            midi_out: pygame.midi.Output,
-            midi_config: MidiConfig,
+            midi_output: MidiOutput,
             script: Script,
             bpm: float,
             delay: float,
     ):
-        self.midi_out = midi_out
-        self.midi_config = midi_config
+        self.midi_output = midi_output
 
         self.script = script
         self.bps = bpm / 60.0
@@ -130,4 +120,4 @@ class ScriptPlayer:
 
     def __call__(self, timestamp: float) -> None:
         for midi_event in self._get_new_midi_events(timestamp):
-            midi_event(self.midi_out, self.midi_config)
+            midi_event(self.midi_output)
