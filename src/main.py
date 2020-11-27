@@ -15,6 +15,7 @@ class App(PygameApp):
             script: str,
             bpm: float,
             delay: float,
+            repeat: bool,
     ):
         super().__init__()
         self.midi_config = MidiConfig(
@@ -28,8 +29,11 @@ class App(PygameApp):
             self.script = None
         else:
             self.script = Script(script)
-        self.bpm = bpm
-        self.delay = delay
+        self._script_player_params = {
+            'bpm': bpm,
+            'delay': delay,
+            'repeat': repeat,
+        }
         self.script_player: ScriptPlayer = None
 
     @property
@@ -53,8 +57,7 @@ class App(PygameApp):
                 self.script_player = ScriptPlayer(
                     midi_output,
                     self.script,
-                    self.bpm,
-                    self.delay,
+                    **self._script_player_params,
                 )
             super().run()
 
@@ -81,6 +84,11 @@ def main():
         '--delay',
         type=float, default=3,
         help='Delay in seconds before starting to play script. Default: 3.',
+    )
+    parser.add_argument(
+        '--repeat',
+        action='store_true',
+        help='Repeat script.',
     )
     args = parser.parse_args()
 

@@ -85,19 +85,23 @@ class ScriptPlayer:
             self,
             midi_output: MidiOutput,
             script: Script,
+            *,
             bpm: float,
             delay: float,
+            repeat: bool = False,
     ):
         self.midi_output = midi_output
 
         self.script = script
         self.bps = bpm / 60.0
         self.delay = delay
+        self.repeat = repeat
 
         self._next_idx = 0
+        self._repeat_offset = self.delay * self.bps
 
     def get_script_time(self, timestamp: float) -> float:
-        return (timestamp - self.delay) * self.bps
+        return timestamp * self.bps - self._repeat_offset
 
     @property
     def _next_midi_event(self) -> MidiEvent:
@@ -107,6 +111,10 @@ class ScriptPlayer:
     def finished(self) -> bool:
         return self._next_idx >= len(self.script.midi_events)
 
+    def _repeat(self):
+        self._repeat_offset += self.script.midi_events[-1].time + self.delay * self.bps
+        self._next_idx = 0
+
     def _get_new_midi_events(self, timestamp: float) -> typing.Iterator[MidiEvent]:
         if self.finished:
             return
@@ -115,7 +123,10 @@ class ScriptPlayer:
         while self._next_midi_event.time <= script_time:
             yield self._next_midi_event
             self._next_idx += 1
+
             if self.finished:
+                if self.repeat:
+                    self._repeat()
                 return
 
     def __call__(self, timestamp: float) -> None:
