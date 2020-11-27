@@ -1,2 +1,3 @@
 pygame==2.*
 -e git+git://github.com/MichaelKim0407/pygame-app.git@develop#egg=pygame_app&subdirectory=src
+returns-decorator

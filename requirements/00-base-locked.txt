@@ -1,2 +1,3 @@
 pygame==2.0.0
--e git://github.com/MichaelKim0407/pygame-app.git@ec1c84a7658673dbd007d9fa31afab6b5d81a391#egg=pygame_app&subdirectory=src
+-e git://github.com/MichaelKim0407/pygame-app.git@75ef273004a580ac5fde479581798db89ebafe99#egg=pygame_app&subdirectory=src
+returns-decorator==1.1
