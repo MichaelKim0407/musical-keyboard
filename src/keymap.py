@@ -13,19 +13,18 @@ class KeyMap:
     """
 
     KEYBOARD_PRIMARY = (
-        pygame.K_a,
-        pygame.K_s,
-        pygame.K_d,
-        pygame.K_f,
-        pygame.K_g,
-        pygame.K_h,
-        pygame.K_j,
-        pygame.K_k,
-        pygame.K_l,
-        pygame.K_SEMICOLON,
-        pygame.K_QUOTE,
-    )
-    KEYBOARD_SECONDARY = (
+        pygame.K_z,
+        pygame.K_x,
+        pygame.K_c,
+        pygame.K_v,
+        pygame.K_b,
+        pygame.K_n,
+        pygame.K_m,
+        pygame.K_COMMA,
+        pygame.K_PERIOD,
+        pygame.K_SLASH,
+        pygame.K_RSHIFT,
+
         pygame.K_q,
         pygame.K_w,
         pygame.K_e,
@@ -38,6 +37,34 @@ class KeyMap:
         pygame.K_p,
         pygame.K_LEFTBRACKET,
         pygame.K_RIGHTBRACKET,
+        pygame.K_BACKSLASH,
+    )
+    KEYBOARD_SECONDARY = (
+        pygame.K_a,
+        pygame.K_s,
+        pygame.K_d,
+        pygame.K_f,
+        pygame.K_g,
+        pygame.K_h,
+        pygame.K_j,
+        pygame.K_k,
+        pygame.K_l,
+        pygame.K_SEMICOLON,
+        pygame.K_QUOTE,
+
+        pygame.K_1,
+        pygame.K_2,
+        pygame.K_3,
+        pygame.K_4,
+        pygame.K_5,
+        pygame.K_6,
+        pygame.K_7,
+        pygame.K_8,
+        pygame.K_9,
+        pygame.K_0,
+        pygame.K_MINUS,
+        pygame.K_EQUALS,
+        pygame.K_BACKSPACE,
     )
 
     SEQUENCE_PRIMARY = (
@@ -50,14 +77,14 @@ class KeyMap:
     class InvalidOffsetValue(Exception):
         pass
 
-    def __init__(self, a_note: int):
+    def __init__(self, z_note: int):
         """
-        :param a_note: The MIDI note number that A key is mapped to.
+        :param z_note: The MIDI note number that Z key is mapped to.
         """
-        seq_pos_offset = a_note % 12
+        seq_pos_offset = z_note % 12
         if seq_pos_offset not in self.SEQUENCE_PRIMARY:
             raise self.InvalidOffsetValue
-        self.pos_offset = self.SEQUENCE_PRIMARY.index(seq_pos_offset) + 7 * (a_note // 12)
+        self.pos_offset = self.SEQUENCE_PRIMARY.index(seq_pos_offset) + 7 * (z_note // 12)
 
     def get_note(self, key: int) -> typing.Optional[int]:
         if key in self.KEYBOARD_PRIMARY:

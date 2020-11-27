@@ -11,7 +11,7 @@ class App(PygameApp):
     def __init__(
             self,
             *,
-            a_note: int,
+            z_note: int,
             script: str,
             bpm: float,
             delay: float,
@@ -21,7 +21,7 @@ class App(PygameApp):
             velocity=127,
         )
 
-        self.keymap = KeyMap(a_note)
+        self.keymap = KeyMap(z_note)
         self.keyboard_player: KeyboardPlayer = None
 
         if script is None:
@@ -63,9 +63,9 @@ def main():
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument(
-        '--a-note',
-        type=int, default=60,
-        help='The MIDI note number A key is mapped to. Default 60 (Middle C / C4).',
+        '--z-note',
+        type=int, default=48,
+        help='The MIDI note number Z key is mapped to. Default 48 (C3).',
     )
     parser.add_argument(
         '--script', '-s',
