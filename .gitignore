@@ -5,3 +5,6 @@
 *.py[cod]
 __pycache__/
 .venv
+
+# Misc
+test/
