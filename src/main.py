@@ -9,10 +9,18 @@ from script import Script, ScriptPlayer, ScriptRenderer
 class App(PygameApp):
     FPS = 60
 
+    MODE_NORMAL = 'normal'
+    MODE_AUTO = 'auto'
+    MODES = {
+        MODE_NORMAL,
+        MODE_AUTO,
+    }
+
     def __init__(
             self,
             *,
             z_note: int,
+            mode: str,
             script: str,
             bpm: float,
             delay: float,
@@ -25,6 +33,11 @@ class App(PygameApp):
 
         self.keymap = KeyMap(z_note)
         self.keyboard_player: KeyboardPlayer = None
+
+        self.mode = mode
+        assert mode in self.MODES
+        if mode == self.MODE_AUTO and script is None:
+            raise ValueError
 
         if script is None:
             self.script = None
@@ -64,7 +77,8 @@ class App(PygameApp):
             self.script_renderer.render(screen)
 
     def handle_event(self, event):
-        self.keyboard_player(event)
+        if self.keyboard_player is not None:
+            self.keyboard_player(event)
 
     def run(self):
         if self.script is not None:
@@ -78,11 +92,12 @@ class App(PygameApp):
             self.script_renderer.init()
 
         with MidiOutput(self.midi_config) as midi_output:
-            self.keyboard_player = KeyboardPlayer(
-                midi_output,
-                self.keymap,
-            )
-            if self.script is not None:
+            if self.mode == self.MODE_NORMAL:
+                self.keyboard_player = KeyboardPlayer(
+                    midi_output,
+                    self.keymap,
+                )
+            if self.script is not None and self.mode == self.MODE_AUTO:
                 self.script_player = ScriptPlayer(
                     midi_output,
                     self.script,
@@ -98,7 +113,15 @@ def main():
     parser.add_argument(
         '--z-note',
         type=int, default=48,
-        help='The MIDI note number Z key is mapped to. Default 48 (C3).',
+        help='The MIDI note number Z key is mapped to. Default: 48 (C3).',
+    )
+    parser.add_argument(
+        '--mode', '-m',
+        type=str, choices=App.MODES, default=App.MODE_NORMAL,
+        help='Play mode. '
+             'Normal: sound is played from keyboard input; '
+             'Auto: sound is played from script and keyboard input is disabled. '
+             'Default: normal.',
     )
     parser.add_argument(
         '--script', '-s',
@@ -108,7 +131,7 @@ def main():
     parser.add_argument(
         '--bpm',
         type=float, default=100,
-        help='Beats per minutes when playing the script. Default 100.'
+        help='Beats per minutes when playing the script. Default: 100.'
     )
     parser.add_argument(
         '--delay',
