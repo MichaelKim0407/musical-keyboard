@@ -1,4 +1,3 @@
-from contextlib import contextmanager
 from dataclasses import dataclass
 
 import pygame.midi as m
@@ -15,11 +14,24 @@ class MidiOutput:
 
     def __init__(
             self,
-            output: m.Output,
             config: MidiConfig,
     ):
-        self.output = output
         self.config = config
+
+        self._output: m.Output = None
+        self._on_notes = set()
+
+    def __enter__(self) -> 'MidiOutput':
+        if not m.get_init():
+            m.init()
+
+        port = m.get_default_output_id()
+        self._output = m.Output(port)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        for note in set(self._on_notes):
+            self.note_off(note)
 
     def note_on(
             self,
@@ -31,11 +43,12 @@ class MidiOutput:
         if velocity is None:
             velocity = self.config.velocity
 
-        self.output.note_on(
+        self._output.note_on(
             note,
             velocity=velocity,
             channel=channel,
         )
+        self._on_notes.add(note)
 
     def note_off(
             self,
@@ -47,23 +60,13 @@ class MidiOutput:
         if velocity is None:
             velocity = self.config.velocity
 
-        self.output.note_off(
+        self._output.note_off(
             note,
             velocity=velocity,
             channel=channel,
         )
+        if note in self._on_notes:
+            self._on_notes.remove(note)
 
     def __call__(self, method, *args, **kwargs):
         getattr(self, method)(*args, **kwargs)
-
-
-@contextmanager
-def init_midi(config: MidiConfig) -> MidiOutput:
-    try:
-        m.init()
-        assert m.get_init()
-        port = m.get_default_output_id()
-        output = m.Output(port)
-        yield MidiOutput(output, config)
-    finally:
-        m.quit()

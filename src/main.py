@@ -1,7 +1,7 @@
 from pygame_app.app import PygameApp
 
 from keymap import KeyMap, KeyboardPlayer
-from midi import MidiConfig, init_midi
+from midi import MidiConfig, MidiOutput
 from script import Script, ScriptPlayer
 
 
@@ -48,7 +48,7 @@ class App(PygameApp):
         self.keyboard_player(event)
 
     def run(self):
-        with init_midi(self.midi_config) as midi_output:
+        with MidiOutput(self.midi_config) as midi_output:
             self.keyboard_player = KeyboardPlayer(
                 midi_output,
                 self.keymap,
