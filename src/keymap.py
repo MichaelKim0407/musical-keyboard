@@ -81,6 +81,7 @@ class KeyMap:
         """
         :param z_note: The MIDI note number that Z key is mapped to.
         """
+        self.z_note = z_note
         seq_pos_offset = z_note % 12
         if seq_pos_offset not in self.SEQUENCE_PRIMARY:
             raise self.InvalidOffsetValue
@@ -102,6 +103,23 @@ class KeyMap:
         if seq_note is None:
             return None
         return seq_note + (abs_pos // 7) * 12
+
+    def get_key(self, note: int) -> typing.Optional[int]:
+        seq_count = note // 12
+        seq_note = note - seq_count * 12
+        if seq_note in self.SEQUENCE_PRIMARY:
+            keys = self.KEYBOARD_PRIMARY
+            seq_pos = self.SEQUENCE_PRIMARY.index(seq_note)
+        elif seq_note in self.SEQUENCE_SECONDARY:
+            keys = self.KEYBOARD_SECONDARY
+            seq_pos = self.SEQUENCE_SECONDARY.index(seq_note) + 1
+        else:
+            return None
+        abs_pos = seq_count * 7 + seq_pos
+        rel_pos = abs_pos - self.pos_offset
+        if rel_pos < 0 or rel_pos >= len(keys):
+            return None
+        return keys[rel_pos]
 
 
 class KeyboardPlayer:

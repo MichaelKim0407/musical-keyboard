@@ -6,5 +6,5 @@
 __pycache__/
 .venv
 
-# Misc
-test/
+# Testing
+.pytest_cache/

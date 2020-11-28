@@ -1,0 +1,11 @@
+attrs==20.3.0
+iniconfig==1.1.1
+packaging==20.5
+pluggy==0.13.1
+py==1.9.0
+pygame==2.0.0
+-e git://github.com/MichaelKim0407/pygame-app.git@75ef273004a580ac5fde479581798db89ebafe99#egg=pygame_app&subdirectory=src
+pyparsing==2.4.7
+pytest==6.1.2
+returns-decorator==1.1
+toml==0.10.2

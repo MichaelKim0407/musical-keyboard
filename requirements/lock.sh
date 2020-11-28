@@ -13,7 +13,14 @@ docker run \
     sh -c "\
         pip install -r requirements/00-base.txt && \
         pip freeze > requirements/00-base-locked.txt && \
-        cat requirements/00-base-locked.txt \
+        echo '' && \
+        cat requirements/00-base-locked.txt && \
+        echo '-----' && \
+        pip install -r requirements/00-base-locked.txt -r requirements/10-dev.txt && \
+        pip freeze > requirements/10-dev-locked.txt && \
+        echo '' && \
+        cat requirements/10-dev-locked.txt && \
+        echo ''
         "
 
 cd "$d0"

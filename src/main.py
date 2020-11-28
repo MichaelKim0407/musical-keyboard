@@ -1,12 +1,13 @@
+from pygame.surface import Surface
 from pygame_app.app import PygameApp
 
 from keymap import KeyMap, KeyboardPlayer
 from midi import MidiConfig, MidiOutput
-from script import Script, ScriptPlayer
+from script import Script, ScriptPlayer, ScriptRenderer
 
 
 class App(PygameApp):
-    FPS = 30
+    FPS = 60
 
     def __init__(
             self,
@@ -36,13 +37,31 @@ class App(PygameApp):
         }
         self.script_player: ScriptPlayer = None
 
+        self.bg_color = (0, 0, 0)  # black
+        self.font_color = (255, 255, 255)  # white
+
+        self._script_renderer_params = {
+            'font_size': 96,
+            'font_color': self.font_color,
+            'lead': 2,
+            'pps': 300,
+        }
+        self.script_renderer: ScriptRenderer = None
+
     @property
     def screen_size(self):
         return 720, 480
 
     def update(self, dt):
         if self.script_player is not None:
-            self.script_player(self.game_time)
+            self.script_player.update(self.game_time)
+        if self.script_renderer is not None:
+            self.script_renderer.update(self.game_time)
+
+    def render(self, screen: Surface):
+        screen.fill(self.bg_color)
+        if self.script_renderer is not None:
+            self.script_renderer.render(screen)
 
     def handle_event(self, event):
         self.keyboard_player(event)
@@ -50,6 +69,13 @@ class App(PygameApp):
     def run(self):
         if self.script is not None:
             self.script.init()
+            self.script_renderer = ScriptRenderer(
+                self.script,
+                self.keymap,
+                **self._script_player_params,
+                **self._script_renderer_params,
+            )
+            self.script_renderer.init()
 
         with MidiOutput(self.midi_config) as midi_output:
             self.keyboard_player = KeyboardPlayer(
