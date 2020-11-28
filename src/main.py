@@ -48,6 +48,9 @@ class App(PygameApp):
         self.keyboard_player(event)
 
     def run(self):
+        if self.script is not None:
+            self.script.init()
+
         with MidiOutput(self.midi_config) as midi_output:
             self.keyboard_player = KeyboardPlayer(
                 midi_output,
@@ -59,6 +62,7 @@ class App(PygameApp):
                     self.script,
                     **self._script_player_params,
                 )
+
             super().run()
 
 

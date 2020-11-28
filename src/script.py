@@ -79,6 +79,9 @@ class Script:
                 note,
             )
 
+    def init(self) -> None:
+        _ = self.midi_events
+
 
 class ScriptPlayer:
     def __init__(
